@@ -1,0 +1,28 @@
+cc_library(
+    name = "assert",
+    hdrs = ["assert.h"],
+    copts = ["-Isrc"],
+    deps = [
+        ":platform",
+    ],
+)
+
+cc_library(
+    name = "platform",
+    srcs = select({
+        "@bazel_tools//src/conditions:windows": ["platform_win.cc"],
+        "//conditions:default": ["platform_linux.cc"],
+    }),
+    hdrs = ["platform.h"] + select({
+        "@bazel_tools//src/conditions:windows": ["platform_win.h"],
+        "//conditions:default": ["platform_linux.h"],
+    }),
+    copts = ["-Isrc"],
+    deps = select({
+        "@bazel_tools//src/conditions:windows": [],  # Todo(bmzhao): support windows builds with bazel
+        "//conditions:default": [
+            "@x11//:x11",
+            "@gtk3//:gtk3",
+        ],
+    }),
+)
